@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.p01.dao.LeaveClassDao">
+	<!--新增請假時段與日期類型-->
+	<insert id="addLeaveClass">
+		insert into leave_class (leave_date,start_time,end_time,leave_hours)
+		values (#{leaveDate}, #{startTime}, #{endTime}, #{leaveHours});		
+	</insert>
+</mapper>

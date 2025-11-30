@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.p01.dao.ClockDateMyBatisDao">
+
+	<update id="clockOff"
+		parameterType="com.example.p01.dto.ClockOffDto">
+
+		update clock_date
+		set clock_off = #{clockOff},
+		total_hour
+		= #{totalHour},
+		score = #{score}
+		where
+		employee_id = #{employeeId}
+		order by id desc
+		limit 1
+
+	</update>
+
+	<select id="checkClockOn">
+
+		select case
+		when clock_on is not null then 1
+		else 0
+		end
+		from clock_date
+		where employee_id = #{employeeId} and
+		work_date = #{workDate}
+		order by id DESC
+		limit 1
+
+	</select>
+
+	<select id="checkClockOff">
+
+		select case
+		when clock_off is not null then 1
+		else 0
+		end
+		from clock_date
+		where employee_id = #{employeeId} and
+		work_date = #{workDate}
+		order by id DESC
+		limit 1
+
+	</select>
+
+	<select id="selectClockDate"
+		resultType="com.example.p01.dto.ClockDateDto">
+
+		select * from clock_date
+		where
+		employee_id = #{employeeId}
+		order by id DESC
+		limit 1
+
+	</select>
+	
+	<select id="getSingleHistoryClock2" resultType="com.example.p01.dto.ClockDate2">
+	select 
+	cd.employee_id as employeeId,
+	cd.work_date as workDate,
+	cd.clock_on as clockOn,
+	cd.clock_off as clockOff,
+	cd.rest_start as restStart,
+	cd.rest_end as restEnd,
+	cd.total_hour as totalHour,
+	cd.has_double as hasDouble,
+	ps.shift_work_id as shiftWorkId,
+	sw.start_time as startTime,
+	sw.end_time as endTime
+	from clock_date cd 
+	left join pre_schedule ps on cd.employee_id = ps.employee_id and 
+	cd.work_date = ps.apply_date 
+	left join shift_work sw on ps.shift_work_id = sw.shift_work_id
+	where cd.work_date between #{startDate} and #{endDate}
+    and cd.employee_id = #{employeeId}
+    order by cd.work_date asc
+	</select>
+
+   <insert id="missClockApply">
+   
+   insert into miss_clock 
+   (employee_id, work_date, clock_on, clock_off, total_hour, has_double, 
+   score, rest_start, rest_end, description, prove, accept)
+   values
+   
+   <foreach collection="list" item="data" separator=",">   
+   (#{data.employeeId}, #{data.workDate}, #{data.clockOn}, #{data.clockOff}, #{data.totalHour},
+    #{data.hasDouble}, #{data.score}, #{data.restStart}, #{data.restEnd},
+    #{data.description},#{data.prove},null)
+   </foreach>
+   
+   </insert>
+   
+   <update id="missClockApprove">
+   
+   update miss_clock 
+   set accept = #{accept}
+   where id = #{id}
+   
+   </update>
+   
+   <select id="getMissClockById">
+   
+   select * from miss_clock where id = #{id}
+   
+   </select>
+   
+   <select id="getMissClockList" resultType="com.example.p01.dto.GetMissClockListDto">
+   
+   select 
+   
+   mc.id as id,
+   mc.employee_id as employeeId,
+   e.name as name,
+   mc.work_date as workDate
+   from miss_clock mc 
+   join employee e on e.id = mc.employee_id
+   where mc.accept is null 
+   order by mc.work_date desc
+   </select>
+
+</mapper>

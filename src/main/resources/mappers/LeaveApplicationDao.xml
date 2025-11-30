@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.p01.dao.LeaveApplicationDao">
+	<!--新增請假申請 -->
+	<insert id="addLeaveApplication">
+		insert into leave_application
+		(employee_id,leave_type,leave_description,leave_prove)
+		values
+		(#{employeeId}, #{leaveType}, #{leaveDescription}, #{leaveProve});
+	</insert>
+
+	<select id="getLatestleaveId">
+		select max(leave_id) from leave_application;
+	</select>
+
+	<update id="updateLeaveApproved">
+		update leave_application set approved =
+		#{inputApproved} where leave_id =
+		#{inputLeaveId}
+	</update>
+
+	<select id="getAllLeaveApplication"
+		resultType="com.example.p01.dto.GetAllLeaveDto">
+		SELECT
+		e.id AS employeeId,
+		e.name AS name,
+		la.leave_id AS
+		leaveId,
+		ld.leave_date AS applyDate,
+		la.leave_type AS leaveType,
+		ld.start_time AS startTime,
+		ld.end_time AS endTime,
+		ld.leave_hours AS
+		leaveHours,
+		la.approved As approved
+		FROM leave_application la
+		JOIN
+		employee e ON e.id =
+		la.employee_id
+		JOIN leave_detail ld ON
+		la.leave_id =
+		ld.leave_id
+		WHERE ld.leave_date BETWEEN #{startDate} AND #{endDate}
+		and
+		la.employee_id = #{employeeId}
+		and la.approved = true or la.approved =
+		false
+		and la.leave_id = #{leaveId}
+		order by ld.leave_date ASC
+	</select>
+
+	<select id="getAllLeaveByEmpolyeeId"
+		resultType="com.example.p01.dto.GetAllLeaveDto">
+		SELECT
+		e.id AS employeeId,
+		e.name AS name,
+		la.leave_id AS
+		leaveId,
+		ld.leave_date AS applyDate,
+		la.leave_type AS leaveType,
+		ld.start_time AS startTime,
+		ld.end_time AS endTime,
+		ld.leave_hours AS
+		leaveHours,
+		la.approved As approved
+		FROM leave_application la
+		JOIN
+		employee e ON e.id =
+		la.employee_id
+		JOIN leave_detail ld ON
+		la.leave_id =
+		ld.leave_id
+		where la.employee_id = #{employeeId}
+		and la.approved is null
+	</select>
+
+	<select id="getApplication"
+		resultType="com.example.p01.dto.GetApplicationAndNameDto">
+		select
+		la.leave_id as leaveId,
+		la.employee_id as employeeId,
+		e.name as name,
+		la.leave_type as leaveType,
+		la.leave_description as
+		leaveDescription,
+		la.leave_prove as leaveProve,
+		la.approved as approved
+		from leave_application la
+		join employee e on la.employee_id = e.id
+		where la.approved is null
+	</select>
+
+	<select id="getApprovedLeave"
+		resultType="com.example.p01.dto.GetApplicationAndNameDto">
+		SELECT
+		la.leave_id AS leaveId,
+		la.employee_id AS employeeId,
+		e.name AS name,
+		la.leave_type AS leaveType,
+		la.leave_description AS
+		leaveDescription,
+		la.leave_prove AS leaveProve,
+		la.approved AS approved
+		FROM leave_application la
+		JOIN employee e ON la.employee_id = e.id
+		JOIN
+		leave_detail ld ON ld.leave_id = la.leave_id
+		WHERE (la.approved = TRUE
+		OR la.approved = FALSE)
+		AND ld.leave_date BETWEEN #{startDate} AND
+		#{endDate}
+		group by la.leave_id
+	</select>
+
+	<select id="getAllLeaveForSalary"
+		resultType="com.example.p01.dto.GetAllLeaveForSalaryDto">
+		SELECT
+		la.leave_id AS leaveId,
+		la.employee_id AS employeeId,
+		e.name AS name,
+		la.leave_type AS leaveType,
+		la.leave_description AS
+		leaveDescription,
+		la.leave_prove AS leaveProve,
+		la.approved AS approved,
+		ld.leave_date as leaveDate,
+		ld.start_time as startTime,
+		ld.end_time as
+		end_time,
+		ld.leave_hours as leaveHours
+		FROM leave_application la
+		JOIN
+		employee e ON la.employee_id = e.id
+		JOIN leave_detail ld ON ld.leave_id
+		= la.leave_id
+		WHERE (la.approved = TRUE OR la.approved = FALSE)
+		AND
+		ld.leave_date BETWEEN #{startDate} AND #{endDate}
+		and la.employee_id =
+		#{employeeId}
+	</select>
+
+	<select id="getLeaveByLeaveId"
+		resultType="com.example.p01.dto.GetAllLeaveForSalaryDto">
+		SELECT
+		la.leave_id AS leaveId,
+		la.employee_id AS employeeId,
+		e.name AS name,
+		la.leave_type AS leaveType,
+		la.leave_description AS
+		leaveDescription,
+		la.leave_prove AS leaveProve,
+		la.approved AS approved,
+		ld.leave_date as leaveDate,
+		ld.start_time as startTime,
+		ld.end_time as
+		end_time,
+		ld.leave_hours as leaveHours
+		FROM leave_application la
+		JOIN
+		employee e ON la.employee_id = e.id
+		JOIN leave_detail ld ON ld.leave_id
+		= la.leave_id
+		WHERE la.leave_id = #{leaveId}
+	</select>
+
+
+</mapper>
+

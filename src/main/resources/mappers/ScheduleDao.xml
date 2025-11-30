@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.p01.dao.PreScheduleMyBatisDao">
+
+	<select id="getThisDaySchedule"
+		resultType="com.example.p01.dto.GetThisDayScheduleDto">
+
+		select
+
+		e.id as employeeId,
+		e.name as name,
+		e.title as title,
+		e.department as department,
+		ps.apply_date as applyDate,
+		ps.shift_work_id as shiftWorkId,
+		sw.start_time as startTime,
+		sw.end_time as endTime
+
+		from employee e
+		join pre_schedule ps on e.id =
+		ps.employee_id
+		join shift_work sw on ps.shift_work_id =
+		sw.shift_work_id
+
+		where ps.apply_date = #{thisDay}
+
+	</select>
+
+	<select id="getStaffCanWorkDay" parameterType="string"
+		resultType="java.time.LocalDate">
+		select
+		apply_date
+		from pre_schedule
+		where
+		employee_id = #{id}
+		and shift_work_id > 0
+		and is_accept = 0
+	</select>
+
+	<insert id="addShiftWork">
+		insert into shift_work
+		(shift_work_id,start_time,end_time)
+		value
+		(#{shiftWorkId},#{startTime},#{endTime});
+	</insert>
+
+	<update id="updateShiftWork">
+
+		update shift_work
+		set start_time = #{startTime},
+		end_time = #{endTime}
+		where shift_work_id = #{shiftWorkId}
+
+	</update>
+
+	<delete id="deleteShiftWork">
+
+		delete from shift_work where shift_work_id =
+		#{shiftWorkId}
+
+	</delete>
+
+
+	<select id="countShiftWorkId">
+
+		select count(shift_work_id) from shift_work where
+		shift_work_id =
+		#{shiftWorkId}
+
+	</select>
+
+	<select id="selectShiftWork">
+
+		select * from shift_work
+		where shift_work_id = #{shiftWorkId}
+
+	</select>
+
+	<select id="getCanSupEmployee"
+		resultType="com.example.p01.dto.GetCanSupEmployeeDto">
+		select
+		ps.employee_id as employeeId,
+		e.name as name,
+		ps.apply_date as canSupdate,
+		ps.shift_work_id as shiftWorkId,
+		sw.start_time as startTime,
+		sw.end_time as endTime
+		from pre_schedule ps
+		join employee e on ps.employee = e.id
+		join shift_work sw on
+		ps.shift_work_id = sw.shift_work_id
+		where ps.apply_date = #{canSupDate}
+		and
+		#{startTime} >= sw.start_time and
+		sw.end_time >= #{endTime}
+	</select>
+
+
+	<select id="schedule" resultType="com.example.p01.dto.Schedule">
+		select
+		ps.employee_id as
+		employeeId,
+		e.name as name,
+		e.title as title,
+		ps.apply_date as applyDate,
+		sw.shift_work_id as shiftWorkId,
+		ps.is_accept as accept,
+		sw.start_time
+		as startTime,
+		sw.end_time as endTime
+		from pre_schedule ps
+		join employee e
+		on ps.employee_id = e.id
+		join shift_work sw on
+		ps.shift_work_id =
+		sw.shift_work_id
+		where ps.is_accept = true
+	</select>
+
+	<select id="getLeaveDateSchedule"
+		resultType="com.example.p01.dto.Schedule">
+		select
+		ps.employee_id as employeeId,
+		e.name as name,
+		e.title
+		as title,
+		ps.apply_date as applyDate,
+		sw.shift_work_id as shiftWorkId,
+		ps.is_accept as accept,
+		sw.start_time as startTime,
+		sw.end_time as
+		endTime
+		from pre_schedule ps
+		join employee e on
+		ps.employee_id = e.id
+		join shift_work sw on
+		ps.shift_work_id = sw.shift_work_id
+		where
+		ps.employee_id = #{employeeId}
+		and ps.apply_date = #{applyDate}
+	</select>
+
+	<select id="countShiftWorkByApplyDate">
+
+		select
+		count(shift_work_id) from pre_schedule where
+		employee_id = #{employeeId} and apply_date = #{applyDate}
+
+	</select>
+
+	<insert id="addSchdule">
+
+		insert into pre_schedule
+		(employee_id,apply_date,shift_work_id,is_accept)
+		values
+		(#{employeeId},#{applyDate},#{shiftWorkId},#{isAccept})
+
+	</insert>
+
+	<select id="countPreScheDule">
+
+		select count(*) from pre_schedule where
+		employee_id = #{employeeId} and
+		apply_date = #{applyDate} and
+		shift_work_id = #{shiftWorkId}
+
+	</select>
+
+	<delete id="deleteSchedule"
+		parameterType="com.example.p01.dto.DeleteScheduleDto">
+
+		delete from pre_schedule where
+		employee_id = #{employeeId} and
+		apply_date = #{applyDate} and
+		shift_work_id = #{shiftWorkId}
+
+	</delete>
+
+	<select id="findAllByApplyDateBetween"
+		resultType="com.example.p01.entity.PreSchedule">
+		SELECT * FROM pre_schedule
+		WHERE apply_date BETWEEN #{startDate} AND #{endDate}
+	</select>
+
+</mapper>

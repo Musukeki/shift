@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="com.example.p01.dao.ClockDateDao1">
+	
+	<!-- useGeneratedKeys="true" keyProperty="id"：MyBatis 會把自增的 id 回填到 ClockDate1.id -->
+	<insert id="insertClockOn" useGeneratedKeys="true" keyProperty="id">
+		insert into clock_date (employee_id, clock_on, clock_off, total_hour, has_double, score)
+			values ( #{employeeId}, #{clockOn}, null, #{totalHour}, #{hasDouble}, #{score} )
+	</insert>
+	
+</mapper>
